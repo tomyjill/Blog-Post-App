@@ -1,0 +1,35 @@
+body {
+  color: #333333;
+  font-family: Georgia, serif;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
+
+.postContainer {
+    padding: 5px 5px;
+    border: 2px solid #969eaa;
+    border-radius: 10px;
+    width: 900px;
+    height: 300px;
+    margin: 15px;
+}
+
+.postTitle {
+    color: darkslategray;
+    text-transform: capitalize;
+    font-weight: bold;
+    font-size: 25px;
+}
+
+.postBody {
+    font-size: 20px;
+}
+.postId {
+    font-size: 20px;
+}
+
