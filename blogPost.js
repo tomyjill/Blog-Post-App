@@ -8,21 +8,10 @@ $(document).ready(function(){
 
     $(document).on('click', '.goToPost', function() {
         const postId = $(this).parent().attr('postId');
-        navigate('post', { postId: postId });
-
-        // $.getJSON(idUrl, function(posts) {
-        //     posts.forEach(post => {
-        //         window.open('postNewPage.html');         
-        //         $('#postIdContainer').append(
-        //             `<div class="body">${post.body}</div>
-        //             <div class="name"> Posted by ${post.name}</div>
-        //             <div class="email">${post.email}</div>`
-        //         );
-        //     });
-        // });
+        navigate('post', { postId });
     });
 
-    $(document).on('click', '#goHome', function() {
+    $(document).on('click', '.goHome', function() {
         navigate('home');
     });
 });
@@ -41,25 +30,39 @@ const navigate = (page, params = {}) => {
         
 const renderPostPage = (params) => {
     const { postId } = params;
-    console.log(postId);
-    // const url = 'https://jsonplaceholder.typicode.com/comments?postId=';
-    // const idUrl = url.concat(postId);
-    $('#container').append('<div>welcome to post page</div>')
-    $('#container').append('<div id="goHome">go home</div>')
+    //console.log(postId);
+    const url = `https://jsonplaceholder.typicode.com/comments?postId=${postId}`;
+
+    $('#container').append('<div id="welcome">Welcome to Post Page</div>');
+
+    $.getJSON(url, function(posts) {
+            posts.forEach(post => {        
+                $('#container').append(
+                    `<div class="postContainer">
+                        <div class="postBody">${post.body}</div>
+                        <br>
+                        <div class="name"> Posted by ${post.name}</div>
+                        <div class="email">${post.email}</div>
+                        <button class="goHome btn btn-outline-info pull-right">Go Home</button>
+                    </div>`
+                );
+            });
+    });
 }
 
 const renderHomePage = (params) => {
+
+    $('#container').append('<div id="welcome">Fresh Post for You</div>');
     const url = 'https://jsonplaceholder.typicode.com/posts';
     
 	$.getJSON(url, function(posts) {
         posts.forEach(post => {
             $('#container').append(
-          //  $('#postsContainer').append(
-                `<div class='postContainer' postId=${post.id}>
+                `<div postId="${post.id}" class="postContainer">
                     <div class="postTitle">${post.title}</div>
                     <div class= "postBody">${post.body}</div>
                     <br>
-                    <div class= "postId"> Posted by ${post.userId}</div>
+                    <div class= "userId"> Posted by ${post.userId}</div>
                     <button class="goToPost btn btn-outline-info pull-right">Go to post</button>
                 </div>`
             );
