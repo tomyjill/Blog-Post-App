@@ -130,12 +130,15 @@ $(document).ready(function(){
             const isInvalidClasses = $(document).find('.is-invalid');
             const firstName = $('#firstName').val();
             const lastName = $("#lastName").val();
+            const email = $('#email').val();
+            const pwd = $('#pwd').val();
             console.log(isInvalidClasses.length);
          if (isValidClasses.length < 4 || isInvalidClasses.length !== 0 ) {
              alert('Please fill in the form correctly!');   
          } else if (isValidClasses.length == 4 && isInvalidClasses.length == 0) {
              $('#submit').attr('disabled', false);
              alert("Thank you " + firstName + ' ' + lastName);
+             storeRegisterForm(firstName, lastName, email, pwd);
          }
         });
     });
@@ -147,21 +150,85 @@ $(document).ready(function(){
             <form onsubmit="return false;" >
                 <div class="form-group">
                     <label for="email">Email address:</label>
-                    <input type="email" class="form-control" id="email" placeholder="Example 123Ab@gmail.com">
+                    <input type="email" class="form-control" id="logInEmail" placeholder="Example 123Ab@gmail.com">
                     <span id="error_email" class="invalid-feedback"></span>
                 </div>
                 <div class="form-group">
                     <label for="pwd">Password:</label>
-                    <input type="password" class="form-control" id="pwd">
+                    <input type="password" class="form-control" id="logInPwd">
                     <span id="error_pwd" class="invalid-feedback"></span>
                     <small id="pwdHelp" class="form-text text-muted">Password should contain minimum 6 characters.</small>
                 </div>
-                <button id="submit" class="btn btn-primary">Login</button>
+                <button id="logInSubmit" class="btn btn-primary">Login</button>
 			</form>`	  
         );
     });
 
+    $(document).on('click', '#logInSubmit', function() {
+        const email = $('#loginEmail').val();
+        const pwd = $('#loginPwd').val();
+        loginCheck(email, pwd);
+    });
 });
+
+const storeRegisterForm = () => {
+    const firstName = $('#firstName').val();
+    const lastName = $('#lastName').val();
+    const email = $('#email').val();
+    const pwd = $('#pwd').val();
+
+    addUserToStorage(firstName, lastName, email, pwd);
+}
+
+const addUserToStorage = (firstName, lastName, email, pwd) => {
+    const newUser = {
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: pwd,
+        logInStatus: false,
+    };
+          // array
+    const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
+    storedUsers.push(newUser);
+    localStorage.setItem('users', JSON.stringify(storedUsers)); 
+}
+
+const loginCheck = (email, pwd) => {
+    const logInEmail = $('#logInEmail').val();
+    const logInPwd = $('#logInPwd').val();
+    
+    const storedUsers = JSON.parse(localStorage.getItem('users')) || []; 
+
+    if (storedUsers.length === 0) {
+        alert('Please register');
+        return;
+    }
+
+    const currentUser = storedUsers.find(user => user.email === logInEmail);
+
+    if (currentUser === undefined) {
+        alert('It seems like you dont exists');
+        return;
+    }
+
+    if (currentUser.password === logInPwd) {
+        alert('You are loged in');
+        $('#container').children().remove();
+        renderHomePage();
+        currentUser.logInStatus = true;
+        $('#logIn').text("Log Off");
+    } else {
+        alert('Incorrect password');
+    }  
+
+    // somehow mark that this user is logged in 
+    // so when i refresh the browser i am still logged in in your website
+    // set isLoggedIn: true
+    // navigate to home page
+
+    localStorage.setItem('user', JSON.stringify(currentUser));
+}
 
 const navigate = (page, params = {}) => {
     $('#container').children().remove();
@@ -173,28 +240,6 @@ const navigate = (page, params = {}) => {
             renderPostPage(params);
         break;
     }
-}
-        
-const renderPostPage = (params) => {
-    const { postId } = params;
-    //console.log(postId);
-    const url = `https://jsonplaceholder.typicode.com/comments?postId=${postId}`;
-
-    $('#container').append('<div id="welcome">Welcome to Post Page</div>');
-
-    $.getJSON(url, function(posts) {
-            posts.forEach(post => {        
-                $('#container').append(
-                    `<div class="postContainer">
-                        <div class="postBody">${post.body}</div>
-                        <br>
-                        <div class="name"> Posted by ${post.name}</div>
-                        <div class="email">${post.email}</div>
-                        <button class="goHome btn btn-outline-danger pull-right">Go Home</button>
-                    </div>`
-                );
-            });
-    });
 }
 
 const renderHomePage = (params) => {
@@ -223,4 +268,28 @@ const renderHomePage = (params) => {
         });
     });
 }
+
+const renderPostPage = (params) => {
+    const { postId } = params;
+    //console.log(postId);
+    const url = `https://jsonplaceholder.typicode.com/comments?postId=${postId}`;
+
+    $('#container').append('<div id="welcome">Welcome to Post Page</div>');
+
+    $.getJSON(url, function(posts) {
+            posts.forEach(post => {        
+                $('#container').append(
+                    `<div class="postContainer">
+                        <div class="postBody">${post.body}</div>
+                        <br>
+                        <div class="name"> Posted by ${post.name}</div>
+                        <div class="email">${post.email}</div>
+                        <button class="goHome btn btn-outline-danger pull-right">Go Home</button>
+                    </div>`
+                );
+            });
+    });
+}
+
+
 			
