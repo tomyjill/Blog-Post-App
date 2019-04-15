@@ -2,6 +2,8 @@
 // https://jsonplaceholder.typicode.com/users/{{ userId }}
 // https://jsonplaceholder.typicode.com/comments?postId={{ postId }}
 
+let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+console.log(currentUser);
 $(document).ready(function(){
     
     navigate('home');
@@ -139,43 +141,18 @@ $(document).ready(function(){
              $('#submit').attr('disabled', false);
              alert("Thank you " + firstName + ' ' + lastName);
              storeRegisterForm(firstName, lastName, email, pwd);
+             navigate('home'); 
          }
         });
     });
 
     $(document).on('click', '#logIn', function() {
-        $('#container').children().remove();
-        $('#container').append(
-            `<div id="logInForm" class="col-md-4 col-sm-4">
-            <form onsubmit="return false;" >
-                <div class="form-group">
-                    <label for="email">Email address:</label>
-                    <input type="email" class="form-control" id="logInEmail" placeholder="Example 123Ab@gmail.com">
-                    <span id="error_email" class="invalid-feedback"></span>
-                </div>
-                <div class="form-group">
-                    <label for="pwd">Password:</label>
-                    <input type="password" class="form-control" id="logInPwd">
-                    <span id="error_pwd" class="invalid-feedback"></span>
-                    <small id="pwdHelp" class="form-text text-muted">Password should contain minimum 6 characters.</small>
-                </div>
-                <button id="logInSubmit" class="btn btn-primary">Login</button>
-			</form>`	  
-        );
+        navigate('login');
     });
 
-    $(document).on('click', '#logInSubmit', function() {
-        const email = $('#loginEmail').val();
-        const pwd = $('#loginPwd').val();
-        loginCheck(email, pwd);
-    });
-
-    $(document).on('click', '.logOff', function() {
-        $('#container').children().remove();
-        renderHomePage();
-        $(this).text("Login");   
+    $(document).on('click', '#logOff', function() {
         deleteStoredCurrentUser();
-        $('#logIn').removeClass('logOff');
+        navigate('home');   
     });
 });
 
@@ -194,7 +171,6 @@ const addUserToStorage = (firstName, lastName, email, pwd) => {
         lastName: lastName,
         email: email,
         password: pwd,
-        logInStatus: false,
     };
           // array
     const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
@@ -202,46 +178,9 @@ const addUserToStorage = (firstName, lastName, email, pwd) => {
     localStorage.setItem('users', JSON.stringify(storedUsers)); 
 }
 
-const loginCheck = (email, pwd) => {
-    const logInEmail = $('#logInEmail').val();
-    const logInPwd = $('#logInPwd').val();
-    
-    const storedUsers = JSON.parse(localStorage.getItem('users')) || []; 
-
-    if (storedUsers.length === 0) {
-        alert('Please register');
-        return;
-    }
-
-    const currentUser = storedUsers.find(user => user.email === logInEmail);
-
-    if (currentUser === undefined) {
-        alert('It seems like you dont exists');
-        return;
-    }
-
-    if (currentUser.password === logInPwd) {
-        alert('You are loged in');
-        $('#container').children().remove();
-        renderHomePage();
-        currentUser.logInStatus = true;
-        $('#logIn').text("Log Off");
-        $('#logIn').addClass('logOff');
-    } else {
-        alert('Incorrect password');
-    }  
-
-    // somehow mark that this user is logged in 
-    // so when i refresh the browser i am still logged in in your website
-    // set isLoggedIn: true
-    // navigate to home page
-
-    localStorage.setItem('user', JSON.stringify(currentUser));
-}
-
 const deleteStoredCurrentUser = () => {
-    const storedUser = JSON.parse(localStorage.getItem('user')) || [];
-    localStorage.removeItem('user'); 
+    localStorage.removeItem('currentUser');
+    currentUser = null; 
 }
 
 const navigate = (page, params = {}) => {
@@ -253,57 +192,9 @@ const navigate = (page, params = {}) => {
         case 'post':
             renderPostPage(params);
         break;
+        case 'login':
+            renderLoginPage(params);
+        break;
     }
 }
-
-const renderHomePage = (params) => {
-
-    $('#container').append('<div id="welcome">Fresh Post for You</div>');
-    $('#container').append(
-        `<div>
-            <button id="logIn" class="btn btn-success pull-right">Login</button>
-            <button id="register" class="btn btn-warning pull-right">Register</button>
-        </div>`
-    );
-        
-    const url = 'https://jsonplaceholder.typicode.com/posts';
-    
-	$.getJSON(url, function(posts) {
-        posts.forEach(post => {
-            $('#container').append(
-                `<div postId="${post.id}" class="postContainer">
-                    <div class="postTitle">${post.title}</div>
-                    <div class= "postBody">${post.body}</div>
-                    <br>
-                    <div class= "userId"> Posted by ${post.userId}</div>
-                    <button class="goToPost btn btn-outline-info pull-right">Go to post</button>
-                </div>`
-            );
-        });
-    });
-}
-
-const renderPostPage = (params) => {
-    const { postId } = params;
-    //console.log(postId);
-    const url = `https://jsonplaceholder.typicode.com/comments?postId=${postId}`;
-
-    $('#container').append('<div id="welcome">Welcome to Post Page</div>');
-
-    $.getJSON(url, function(posts) {
-            posts.forEach(post => {        
-                $('#container').append(
-                    `<div class="postContainer">
-                        <div class="postBody">${post.body}</div>
-                        <br>
-                        <div class="name"> Posted by ${post.name}</div>
-                        <div class="email">${post.email}</div>
-                        <button class="goHome btn btn-outline-danger pull-right">Go Home</button>
-                    </div>`
-                );
-            });
-    });
-}
-
-
 			
