@@ -169,6 +169,14 @@ $(document).ready(function(){
         const pwd = $('#loginPwd').val();
         loginCheck(email, pwd);
     });
+
+    $(document).on('click', '.logOff', function() {
+        $('#container').children().remove();
+        renderHomePage();
+        $(this).text("Login");   
+        deleteStoredCurrentUser();
+        $('#logIn').removeClass('logOff');
+    });
 });
 
 const storeRegisterForm = () => {
@@ -218,6 +226,7 @@ const loginCheck = (email, pwd) => {
         renderHomePage();
         currentUser.logInStatus = true;
         $('#logIn').text("Log Off");
+        $('#logIn').addClass('logOff');
     } else {
         alert('Incorrect password');
     }  
@@ -228,6 +237,11 @@ const loginCheck = (email, pwd) => {
     // navigate to home page
 
     localStorage.setItem('user', JSON.stringify(currentUser));
+}
+
+const deleteStoredCurrentUser = () => {
+    const storedUser = JSON.parse(localStorage.getItem('user')) || [];
+    localStorage.removeItem('user'); 
 }
 
 const navigate = (page, params = {}) => {
