@@ -40,7 +40,7 @@ const loginCheck = (email, pwd) => {
     }
 
     if (user.password === logInPwd) {
-        alert('You are loged in');
+        alert('You are logged in');
         currentUser = user;
         localStorage.setItem('currentUser', JSON.stringify(user));
         navigate('home');

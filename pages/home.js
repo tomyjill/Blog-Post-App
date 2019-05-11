@@ -11,7 +11,8 @@ const renderHomePage = (params) => {
             `<div>
                 <h2>Hi ${currentUser.firstName}</h2>
                 <button id="logOff" class="btn btn-primary pull-right">Log Off</button>
-            </div>`
+                <button id="addPost" class="btn btn-secondary pull-right">Add Post</button>    
+                /d<iv>`
     );
         
     const url = 'https://jsonplaceholder.typicode.com/posts';

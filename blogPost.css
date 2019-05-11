@@ -23,6 +23,10 @@ body {
   margin-left: 5px;
 }
 
+#addPost {
+  margin-right: 5px;
+}
+
 #registerForm {
   margin: 50px;
   font-weight: bold;
